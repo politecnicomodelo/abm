@@ -19,7 +19,8 @@ class Controlador(object):
 
         print("1: Continente")
         print("2: Pais")
-        print("5. Salir")
+        print("3: Provincia")
+        print("5: Salir")
         print("")
         print("Ingresame que queres crear")
         ingreso = input()
@@ -28,8 +29,16 @@ class Controlador(object):
     @classmethod
     def imprimir_lugar(cls, lista):
 
+        print("--- CONTINENTES")
         for i in lista:
             print(i.codigo + " | " + i.nombre + " | " + i.tipo + " | " + str(len(i.dependencias)))
+        print("")
+        print("--- PAISES")
+        print("")
+        for continente in lista:
+            for pais in continente.dependencias:
+                print(pais.codigo + " | " + pais.nombre + " | " + pais.tipo + " | " + str(len(pais.dependencias)))
+
 
     @classmethod
     def crear_lugar(cls, continentes):
@@ -41,6 +50,8 @@ class Controlador(object):
             Controlador.ingresar_datos_lugar(continentes, "Continente")
         if ingreso == "2":
             Controlador.ingresar_datos_lugar(continentes, "Pais")
+        if ingreso == "3":
+            Controlador.ingresar_datos_lugar(continentes, "Provincia")
         if ingreso == "5":
             return
 
@@ -74,20 +85,20 @@ class Controlador(object):
         print("Ingrese el codigo de continente")
         continente = input()
 
-        print(lugar.tipo)
         if lugar.tipo != "Pais":
             print("")
             print("Ingrese el codigo de pais")
             pais = input()
 
-        elif lugar.tipo != "Provincia":
-            print("")
-            print("Ingrese el codigo de provincia")
-            provincia = input()
+            if lugar.tipo != "Provincia":
+                print("")
+                print("Ingrese el codigo de provincia")
+                provincia = input()
 
         for con in continentes:
-            if str(con.codigo) == continente:
+            if con.codigo == continente:
                 if lugar.tipo != "Pais":
-                    pass
+                    for pa in continente.dependencias:
+                        pass
                 else:
                     con.dependencias.append(lugar)
