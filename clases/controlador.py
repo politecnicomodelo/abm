@@ -1,5 +1,6 @@
 import os
 from clases.lugar import Lugar
+from clases.barrio import Barrio
 
 class Controlador(object):
 
@@ -20,7 +21,9 @@ class Controlador(object):
         print("1: Continente")
         print("2: Pais")
         print("3: Provincia")
-        print("5: Salir")
+        print("4: Ciudad")
+        print("5: Barrio")
+        print("6: Salir")
         print("")
         print("Ingresame que queres crear")
         ingreso = input()
@@ -37,7 +40,17 @@ class Controlador(object):
         print("")
         for continente in lista:
             for pais in continente.dependencias:
-                print(pais.codigo + " | " + pais.nombre + " | " + pais.tipo + " | " + str(len(pais.dependencias)))
+                print(pais.codigo + " | " + pais.nombre + " | " + continente.nombre + " | " + str(len(pais.dependencias)))
+                print("")
+                for provincia in pais.dependencias:
+                    print("    - " + provincia.codigo + " | " + provincia.nombre + " | " + provincia.tipo + " | " + str(len(provincia.dependencias)))
+                    print("")
+                    for ciudad in provincia.dependencias:
+                        print("        - " + ciudad.codigo + " | " + ciudad.nombre + " | " + ciudad.tipo + " | " + str(len(ciudad.dependencias)))
+                        print("")
+                        for barrio in ciudad.dependencias:
+                            print("            - " + barrio.codigo + " | " + barrio.nombre + " | " + str(barrio.poblacion))
+                    print("")
 
 
     @classmethod
@@ -52,7 +65,11 @@ class Controlador(object):
             Controlador.ingresar_datos_lugar(continentes, "Pais")
         if ingreso == "3":
             Controlador.ingresar_datos_lugar(continentes, "Provincia")
+        if ingreso == "4":
+            Controlador.ingresar_datos_lugar(continentes, "Ciudad")
         if ingreso == "5":
+            Controlador.ingresar_datos_lugar(continentes, "Barrio")
+        if ingreso == "6":
             return
 
     @classmethod
@@ -72,33 +89,93 @@ class Controlador(object):
         y = input()
         print("")
 
-        l = Lugar(codigo, nombre, (x,y), tipo)
-        if tipo == "Continente":
-            continentes.append(l)
+        if tipo != "Barrio":
+            l = Lugar(codigo, nombre, (x,y), tipo)
+            if tipo == "Continente":
+                continentes.append(l)
+            else:
+                Controlador.meter_lista(l, continentes)
         else:
-            Controlador.meter_lista(l, continentes)
+            print("Ingresa la poblacion")
+            poblacion = input()
+            poblacion = int(poblacion)
+            print("")
+            b = Barrio(codigo, nombre, (x,y), poblacion)
+            Controlador.insertar_barrio(b, continentes)
         return
 
     @classmethod
     def meter_lista(cls, lugar, continentes):
 
-        print("Ingrese el codigo de continente")
-        continente = input()
+        if lugar.tipo == "Pais":
+            print("Ingrese el codigo de continente")
+            continente = input()
 
-        if lugar.tipo != "Pais":
+        elif lugar.tipo == "Provincia":
             print("")
             print("Ingrese el codigo de pais")
             pais = input()
 
-            if lugar.tipo != "Provincia":
-                print("")
-                print("Ingrese el codigo de provincia")
-                provincia = input()
+        elif lugar.tipo == "Ciudad":
+            print("")
+            print("Ingrese el codigo de provincia")
+            provincia = input()
 
         for con in continentes:
-            if con.codigo == continente:
-                if lugar.tipo != "Pais":
-                    for pa in continente.dependencias:
-                        pass
-                else:
+            if lugar.tipo == "Pais":
+                if con.codigo == continente:
                     con.dependencias.append(lugar)
+            else:
+                for pa in con.dependencias:
+                    if lugar.tipo == "Provincia":
+                        if pa.codigo == pais:
+                            pa.dependencias.append(lugar)
+                    else:
+                        for pro in pa.dependencias:
+                            if lugar.tipo == "Ciudad":
+                                if pro.codigo == provincia:
+                                    pro.dependencias.append(lugar)
+
+
+    @classmethod
+    def insertar_barrio(cls, barrio, continentes):
+
+        print("Ingrese el codigo de ciudad")
+        ciudad = input()
+        print("")
+
+        ciudad = Controlador.devolver_ciudad(continentes, ciudad)
+
+        ciudad.dependencias.append(barrio)
+
+    @classmethod
+    def devolver_ciudad(cls, continentes, ciudad):
+
+        for con in continentes:
+            for pa in con.dependencias:
+                for pro in pa.dependencias:
+                    for ciu in pro.dependencias:
+                        if ciu.codigo == ciudad:
+                            return ciu
+        return False
+
+    @classmethod
+    def buscar_barrio(cls, continentes):
+
+        print("Ingrese el codigo de contientente")
+        continente = input()
+        print("")
+        print("Ingrese el codigo de pais")
+        pais = input()
+        print("")
+        print("Ingrese el codigo de provincia")
+        provincia = input()
+        print("")
+        print("Ingrese el codigo de ciudad")
+        ciudad = input()
+        print("")
+        print("Ingrese el codigo del barrio")
+        barrio = input()
+        print("")
+
+        ciudad = Controlador.devolver_ciudad(continentes, ciudad)
